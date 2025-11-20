@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlalchemy
+pdfplumber
+pandas
+pydantic
+python-multipart

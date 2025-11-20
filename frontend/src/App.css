@@ -1,0 +1,380 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700&family=PT+Serif:wght@400;700&display=swap');
+
+body {
+  background-color: #fafaf9;
+  color: #393d38;
+  font-family: 'Hind', sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+
+/* HEADERS */
+h1, h2 { font-family: 'PT Serif', serif; }
+.skater-name {
+  font-family: 'Fira Sans', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+/* --- TABLE RESET --- */
+table {
+  border-collapse: collapse;
+  margin-bottom: 5px;
+  table-layout: fixed;
+  width: 650px; 
+}
+
+th {
+  background-color: #e2e8f0; 
+  color: #1e293b; 
+  border-bottom: 2px solid #cbd5e1;
+  font-family: 'Fira Sans', sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  height: 35px;
+  vertical-align: bottom;
+  padding: 5px 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+td {
+  font-family: 'Hind', sans-serif;
+  font-size: 15px;
+  padding: 4px 2px;
+  text-align: center;
+  border-bottom: 1px solid #e6e3de;
+  overflow-wrap: break-word;
+}
+
+/* Zebra Striping */
+tbody tr:nth-child(even) { background-color: #f3f4f6; }
+tbody tr:nth-child(odd) { background-color: #ffffff; }
+tbody tr:hover td { background-color: #e5e7eb; }
+/* --- RED/GREEN ROW LOGIC --- */
+.row-red td { color: #BF0000; font-weight: 500; }
+.row-green td { color: #008000; font-weight: 500; }
+.text-green { color: #008000 !important; font-weight: 600; }
+
+
+/* --- 1. ELEMENTS TABLE WIDTHS (.tes) --- */
+/* Adjusted widths to fix overlap:
+   - Increased Base Value to 80px
+   - Increased Left Padding to 15px
+*/
+.tes th:nth-child(1), .tes td:nth-child(1) { width: 150px; text-align: left; padding-left: 15px; font-weight: 700; }
+.tes th:nth-child(2), .tes td:nth-child(2) { width: 80px; } /* Widened for "Base Value" text */
+.tes th:nth-child(3), .tes td:nth-child(3) { width: 45px; }
+/* Judges (J1-J9) */
+.tes th:nth-child(n+4):nth-child(-n+12), 
+.tes td:nth-child(n+4):nth-child(-n+12) { width: 28px; font-size: 15px; }
+/* Score */
+.tes th:nth-child(13), .tes td:nth-child(13) { width: 60px; font-weight: 700; }
+
+
+/* --- 2. COMPONENTS TABLE WIDTHS (.pcs) --- */
+.pcs th:nth-child(1), .pcs td:nth-child(1) { width: 180px; text-align: left; padding-left: 15px; font-weight: 700; }
+.pcs th:nth-child(2), .pcs td:nth-child(2) { width: 50px; }
+/* Judges (J1-J9) */
+.pcs th:nth-child(n+3):nth-child(-n+11), 
+.pcs td:nth-child(n+3):nth-child(-n+11) { width: 28px; font-size: 15px; }
+/* Score */
+.pcs th:nth-child(12), .pcs td:nth-child(12) { width: 60px; font-weight: 700; }
+
+
+
+/* --- 3. SUMMARY FOOTER (.tot) --- */
+/* --- 3. SUMMARY FOOTER (.tot) --- */
+.tot {
+  /* The table background is just a backup */
+  background-color: #cbd5e1 !important;
+  width: 650px; 
+  margin-top: 25px;
+  border: none;
+  table-layout: fixed; 
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* CRITICAL FIX: Force the row to be beige, overriding global zebra striping */
+.tot tr {
+  background-color: #cbd5e1 !important;
+}
+
+/* Ensure hover doesn't change it either */
+.tot tr:hover {
+  background-color: #cbd5e1 !important;
+}
+
+.tot td {
+  width: 20%;
+  padding: 5px 0;
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  color: #000;
+  /* Ensure cell is transparent so the row color shines through */
+  background-color: transparent !important; 
+}
+
+/* STACKED TEXT STYLING */
+.tot-label {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.tot-val {
+  font-family: 'Hind', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* TOTAL SCORE BOX */
+.total-score-box {
+  border: 3px solid #475569;
+  color: #0f172a;
+  background-color: #f8fafc;
+  margin: 0 auto;
+  width: 110px;
+  padding: 5px 0;
+}
+
+.total-score-box .tot-label {
+  color: #000;
+  font-weight: 700;
+}
+
+.total-score-box .tot-val {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+/* --- ANALYTICS DASHBOARD --- */
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.analytics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.analytics-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.analytics-card h3 {
+  margin-top: 0;
+  font-family: 'PT Serif', serif;
+  font-size: 1.1rem;
+  color: #334155;
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* --- RADAR CARD SPECIFIC LAYOUT --- */
+/* This creates the split view (Chart Left, Controls Right) */
+.radar-card-layout {
+  display: flex;
+  gap: 0;
+  padding: 0 !important; /* Remove default padding to let controls touch edge */
+  overflow: hidden;
+  height: 450px; /* Fixed height for scrolling */
+}
+
+.radar-chart-area {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* THE TOGGLE BOX */
+.radar-controls {
+  width: 220px;
+  background-color: #f8fafc;
+  border-left: 1px solid #e2e8f0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Allows scrolling if many skaters */
+}
+
+.radar-controls h4 {
+  margin-top: 0;
+  font-family: 'PT Serif', serif;
+  font-size: 0.95rem;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.radar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radar-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.radar-toggle-item:hover { background-color: #e2e8f0; }
+
+.radar-label-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.rank-badge {
+  background-color: #cbd5e1;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+  font-weight: 700;
+}
+
+
+/* FIXED ALIGNMENT FOR ANALYTICS TABLES */
+.analytics-card table {
+  width: 100%;
+  table-layout: fixed; /* Strict column widths */
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+
+/* Header & Cell Padding */
+.analytics-card th,
+.analytics-card td {
+  padding: 8px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analytics-card th {
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.analytics-card td {
+  border-bottom: 1px solid #f8fafc;
+}
+
+/* COLUMN WIDTHS (Total 100%) */
+/* Rank: 15% */
+.analytics-card th:nth-child(1),
+.analytics-card td:nth-child(1) {
+  width: 15%;
+  color: #94a3b8;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Name/Skater: 45% */
+.analytics-card th:nth-child(2),
+.analytics-card td:nth-child(2) {
+  width: 45%;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Element/Score (Right columns): 20% each */
+.analytics-card th:nth-child(3),
+.analytics-card td:nth-child(3),
+.analytics-card th:nth-child(4),
+.analytics-card td:nth-child(4) {
+  width: 20%;
+  text-align: right; /* Numbers look better right-aligned */
+}
+
+/* Ensure headers for numbers align right too */
+.analytics-card th:nth-child(3),
+.analytics-card th:nth-child(4) {
+  text-align: right;
+}
+
+.rank-cell {
+  width: 30px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.bold-text {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* --- HEADER CONTROLS (Navigation Buttons) --- */
+.container header button {
+  font-family: 'Fira Sans', sans-serif !important; /* Forces the correct font */
+}
+
+/* "Back to Seasons" Button */
+.container header > button {
+  color: #64748b;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.container header > button:hover {
+  color: #334155;
+}
+
+/* Toggle Buttons (Protocols / Analytics) */
+.controls button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background-color: white;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.2s;
+}
+
+.controls button:hover {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.controls button.active {
+  background-color: #334155; /* Matches landing page theme */
+  color: white;
+  border-color: #334155;
+}
