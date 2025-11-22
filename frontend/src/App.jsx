@@ -12,15 +12,20 @@ function App() {
   const [programFilter, setProgramFilter] = useState(null); 
   const [categoryFilter, setCategoryFilter] = useState(null);
   
+  // New state to store competition metadata for the title
+  const [compMeta, setCompMeta] = useState({ name: '', year: '' });
+  
   const [performances, setPerformances] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleNavigation = (compId, targetView, programType, category) => {
+  // Updated signature to accept compName and compYear
+  const handleNavigation = (compId, targetView, programType, category, compName, compYear) => {
     setLoading(true);
     setSelectedCompId(compId);
     setView(targetView);
     setProgramFilter(programType);
     setCategoryFilter(category);
+    setCompMeta({ name: compName, year: compYear });
 
     // PASS CATEGORY to filter detailed protocols
     axios.get(`http://localhost:8000/performances/${compId}`, {
@@ -42,12 +47,24 @@ function App() {
     setPerformances([]);
     setProgramFilter(null);
     setCategoryFilter(null);
+    setCompMeta({ name: '', year: '' });
   };
 
   const filteredPerformances = performances.filter(p => {
       if (!programFilter) return true;
       return p.program_type === programFilter;
   });
+
+  // Helper to format the title dynamically
+  // e.g. "GP Skate America Men's Free Skate (25-26)"
+  const getPageTitle = () => {
+    if (!categoryFilter || !programFilter) return 'Competition View';
+
+    const categoryDisplay = categoryFilter === 'Men' ? "Men's" : categoryFilter === 'Women' ? "Women's" : categoryFilter;
+    const programDisplay = programFilter === 'Short' ? "Short Program" : programFilter === 'Free' ? "Free Skate" : programFilter;
+
+    return `${compMeta.name} ${categoryDisplay} ${programDisplay} (${compMeta.year})`;
+  };
 
   return (
     <div>
@@ -60,14 +77,14 @@ function App() {
           <header style={{display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '30px'}}>
             <button 
               onClick={goHome}
-              style={{border:'none', background:'transparent', fontSize:'1.2rem', cursor:'pointer'}}
+              style={{border:'none', background:'transparent', fontSize:'1.2rem', cursor:'pointer', fontFamily:'PT Serif'}}
             >
               ← Back to Seasons
             </button>
             
             <div style={{flex: 1, textAlign:'center'}}>
                <h2 style={{margin:0, fontFamily:'PT Serif'}}>
-                 {categoryFilter} {programFilter ? `${programFilter} Program` : 'Competition View'}
+                 {getPageTitle()}
                </h2>
             </div>
 

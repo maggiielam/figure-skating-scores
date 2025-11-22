@@ -5,41 +5,41 @@ from scraper import scrape_pdf, init_db
 # Format: (pdf_path, competition_name, season, program_type, category, location, date)
 # ---------------------------------------------------------
 TASKS = [
-    (
-        "/Users/maggie/Downloads/m_free.pdf", 
-        "GP de France", 
-        "2025-2026", 
-        "Free", 
-        "Men", 
-        "Angers, FRA",
-        "Oct 17-19"
-    ),
+    # (
+    #     "/Users/maggie/Downloads/m_free.pdf", 
+    #     "GP de France", 
+    #     "2025-2026", 
+    #     "Free", 
+    #     "Men", 
+    #     "Angers, FRA",
+    #     "Oct 17-19"
+    # ),
     (
         "/Users/maggie/Downloads/m_short.pdf", 
-        "GP de France", 
+        "GP Finlandia Trophy", 
         "2025-2026", 
         "Short", 
         "Men", 
-        "Angers, FRA",
-        "Oct 17-19"
+        "Helsinki, FIN",
+        "Nov 21-22"
     ),
-    (
-        "/Users/maggie/Downloads/w_free.pdf", 
-        "GP de France", 
-        "2025-2026", 
-        "Free", 
-        "Women", 
-        "Angers, FRA",
-        "Oct 17-19"
-    ),
+    # (
+    #     "/Users/maggie/Downloads/w_free.pdf", 
+    #     "GP de France", 
+    #     "2025-2026", 
+    #     "Free", 
+    #     "Women", 
+    #     "Angers, FRA",
+    #     "Oct 17-19"
+    # ),
     (
         "/Users/maggie/Downloads/w_short.pdf", 
-        "GP de France", 
+        "GP Finlandia Trophy", 
         "2025-2026", 
         "Short", 
         "Women", 
-        "Angers, FRA",
-        "Oct 17-19"
+        "Helsinki, FIN",
+        "Nov 21-22"
     )
 ]
 
