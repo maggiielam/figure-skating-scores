@@ -112,9 +112,9 @@ function App() {
                {view === 'analytics' && <Analytics performances={filteredPerformances} />}
              </>
           )}
+          <Analytics />
         </div>
       )}
-      <Analytics />
     </div>
   );
 }
