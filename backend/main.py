@@ -6,16 +6,23 @@ import os
 
 app = FastAPI()
 
+# --- CORS CONFIGURATION ---
+# This tells the backend to trust requests from your Vercel frontend
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "*"  # Allow all for now to ensure connection works
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Cache data in memory on startup so it's super fast
-# In production, if you update CSVs, the server usually restarts, refreshing this cache
+# Cache data in memory on startup
 class DataCache:
     competitions = []
     performances = []
@@ -24,15 +31,21 @@ class DataCache:
 
 @app.on_event("startup")
 def load_csv_data():
+    # Load CSVs when server starts
     if os.path.exists(FILES["competitions"]):
-        DataCache.competitions = pd.read_csv(FILES["competitions"]).to_dict('records')
+        DataCache.competitions = pd.read_csv(FILES["competitions"]).fillna('').to_dict('records')
     if os.path.exists(FILES["performances"]):
-        DataCache.performances = pd.read_csv(FILES["performances"]).to_dict('records')
+        DataCache.performances = pd.read_csv(FILES["performances"]).fillna('').to_dict('records')
     if os.path.exists(FILES["elements"]):
-        DataCache.elements = pd.read_csv(FILES["elements"]).to_dict('records')
+        DataCache.elements = pd.read_csv(FILES["elements"]).fillna('').to_dict('records')
     if os.path.exists(FILES["components"]):
-        DataCache.components = pd.read_csv(FILES["components"]).to_dict('records')
+        DataCache.components = pd.read_csv(FILES["components"]).fillna('').to_dict('records')
     print("✅ CSV Data Loaded into Memory")
+
+# --- NEW: Homepage Route ---
+@app.get("/")
+def read_root():
+    return {"status": "online", "message": "The Skating Scores API is running!"}
 
 @app.get("/competitions")
 def get_competitions():
@@ -40,13 +53,11 @@ def get_competitions():
 
 @app.get("/competition/{competition_id}/summary")
 def get_competition_summary(competition_id: int, category: str = None):
-    # Filter performances using list comprehension (fast for small/medium datasets)
     perfs = [p for p in DataCache.performances if p['competition_id'] == competition_id]
     
     if category:
         perfs = [p for p in perfs if p['category'] == category]
     
-    # Grouping Logic
     skaters = {}
     for p in perfs:
         name = p['skater_name']
@@ -59,10 +70,12 @@ def get_competition_summary(competition_id: int, category: str = None):
                 "total": 0
             }
         
-        if "Short" in p['program_type']:
-            skaters[name]["sp"] = {"score": p['total_score'], "rank": int(p['rank'])}
-        elif "Free" in p['program_type']:
-            skaters[name]["fs"] = {"score": p['total_score'], "rank": int(p['rank'])}
+        # Robust check for program type
+        p_type = str(p['program_type'])
+        if "Short" in p_type:
+            skaters[name]["sp"] = {"score": p['total_score'], "rank": p['rank']}
+        elif "Free" in p_type:
+            skaters[name]["fs"] = {"score": p['total_score'], "rank": p['rank']}
 
     summary_list = []
     for data in skaters.values():
@@ -78,24 +91,20 @@ def get_competition_summary(competition_id: int, category: str = None):
 
 @app.get("/performances/{competition_id}")
 def get_performances(competition_id: int, category: str = None):
-    # 1. Filter Performances
     perfs = [p for p in DataCache.performances if p['competition_id'] == competition_id]
     if category:
         perfs = [p for p in perfs if p['category'] == category]
         
     perf_ids = [p['id'] for p in perfs]
 
-    # 2. Filter Elements & Components (Optimized with Sets)
     relevant_elements = [e for e in DataCache.elements if e['performance_id'] in perf_ids]
     relevant_components = [c for c in DataCache.components if c['performance_id'] in perf_ids]
 
     data = []
     for p in perfs:
-        # Join data manually
         my_elements = [e for e in relevant_elements if e['performance_id'] == p['id']]
         my_components = [c for c in relevant_components if c['performance_id'] == p['id']]
         
-        # Sort
         my_elements.sort(key=lambda x: x['element_index'])
         my_components.sort(key=lambda x: x['component_index'])
 
