@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+// FIXED: Ensure CSS import path is correct and file exists in the same directory
 import '../LandingPage.css';
 
 // --- CONFIGURATION ---
-// FIXED: This robust check supports both Vite (import.meta) and standard environments (process.env)
-// It safely checks if import.meta exists before trying to access it.
+// FIXED: Robust API_BASE_URL resolution that works in Vite (import.meta), 
+// Create React App (process.env), and this preview environment.
 let API_BASE_URL = 'http://localhost:8000';
 
 try {
-  // Check if we are in a Vite environment
-  if (import.meta && import.meta.env && import.meta.env.VITE_API_URL) {
+  // 1. Try Vite's import.meta (safely checked)
+  const isVite = typeof import.meta !== 'undefined' && import.meta.env;
+  
+  if (isVite && import.meta.env.VITE_API_URL) {
     API_BASE_URL = import.meta.env.VITE_API_URL;
   } 
-  // Fallback to process.env for other environments (like this preview or Create React App)
+  // 2. Try Standard process.env (Create React App / Node)
   else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
     API_BASE_URL = process.env.REACT_APP_API_URL;
   }
 } catch (e) {
-  // If any access fails, we stick to the default localhost
-  console.warn("Could not read environment variables, defaulting to localhost");
+  // If accessing these objects throws an error (e.g. strict mode or specific bundlers),
+  // we silently fall back to the default localhost.
+  console.log("Using default API URL:", API_BASE_URL);
+}
+
+// Remove trailing slash if present to avoid double slashes like '...com//competitions'
+if (API_BASE_URL.endsWith('/')) {
+    API_BASE_URL = API_BASE_URL.slice(0, -1);
 }
 
 const PodiumTable = ({ compId, discipline }) => {
@@ -35,6 +44,7 @@ const PodiumTable = ({ compId, discipline }) => {
         setLoading(false);
       })
       .catch(err => {
+        console.error("Error loading summary:", err);
         setLoading(false);
       });
   }, [compId, discipline]);
@@ -81,8 +91,11 @@ export default function LandingPage({ onNavigate }) {
 
   useEffect(() => {
     // UPDATED: Using API_BASE_URL
+    console.log("Fetching competitions from:", `${API_BASE_URL}/competitions`);
+    
     axios.get(`${API_BASE_URL}/competitions`)
       .then(res => {
+        console.log("Competitions loaded:", res.data);
         const grouped = groupCompetitionsByYear(res.data);
         setSeasons(grouped);
         if(grouped.length > 0) {
@@ -163,7 +176,10 @@ export default function LandingPage({ onNavigate }) {
       </div>
 
       {seasons.length === 0 && (
-        <div style={{textAlign:'center', color:'#64748b'}}>No data found.</div>
+        <div style={{textAlign:'center', color:'#64748b'}}>
+            <p>No data found.</p>
+            <p style={{fontSize:'0.8em'}}>Attempting to fetch from: {API_BASE_URL}</p>
+        </div>
       )}
 
       {seasons.map((season) => (
