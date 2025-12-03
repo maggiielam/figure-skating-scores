@@ -93,7 +93,7 @@ const RankTable = ({ title, data, columns }) => (
   </div>
 );
 
-export default function Analytics({ performances }) {
+export default function ScoreAnalytics({ performances }) {
   // --- STATE ---
   const [radarSelectedIds, setRadarSelectedIds] = useState([]);
   

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ScoreTable from './components/ScoreTable';
-import Analytics from './components/Analytics';
+import ScoreAnalytics from './components/ScoreAnalytics';
 import LandingPage from './components/LandingPage';
+import { Analytics } from "@vercel/analytics/react"
 import './App.css';
 import './LandingPage.css';
 
@@ -109,12 +110,12 @@ function App() {
           ) : (
              <>
                {view === 'scores' && <ScoreTable performances={filteredPerformances} />}
-               {view === 'analytics' && <Analytics performances={filteredPerformances} />}
+               {view === 'analytics' && <ScoreAnalytics performances={filteredPerformances} />}
              </>
           )}
-          <Analytics />
         </div>
       )}
+      <Analytics />
     </div>
   );
 }
