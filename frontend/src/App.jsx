@@ -28,7 +28,7 @@ function App() {
     setCompMeta({ name: compName, year: compYear });
 
     // PASS CATEGORY to filter detailed protocols
-    axios.get(`http://localhost:8000/performances/${compId}`, {
+    axios.get(`https://figure-skating-scores.onrender.com/performances/${compId}`, {
         params: { category: category }
     })
       .then(res => {
