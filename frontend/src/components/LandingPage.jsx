@@ -6,24 +6,24 @@ import '../LandingPage.css';
 // --- CONFIGURATION ---
 // FIXED: Robust API_BASE_URL resolution that works in Vite (import.meta), 
 // Create React App (process.env), and this preview environment.
-let API_BASE_URL = 'http://localhost:8000';
+let API_BASE_URL = 'https://figure-skating-scores.onrender.com';
 
-try {
-  // 1. Try Vite's import.meta (safely checked)
-  const isVite = typeof import.meta !== 'undefined' && import.meta.env;
+// try {
+//   // 1. Try Vite's import.meta (safely checked)
+//   const isVite = typeof import.meta !== 'undefined' && import.meta.env;
   
-  if (isVite && import.meta.env.VITE_API_URL) {
-    API_BASE_URL = import.meta.env.VITE_API_URL;
-  } 
-  // 2. Try Standard process.env (Create React App / Node)
-  else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
-    API_BASE_URL = process.env.REACT_APP_API_URL;
-  }
-} catch (e) {
-  // If accessing these objects throws an error (e.g. strict mode or specific bundlers),
-  // we silently fall back to the default localhost.
-  console.log("Using default API URL:", API_BASE_URL);
-}
+//   if (isVite && import.meta.env.VITE_API_URL) {
+//     API_BASE_URL = import.meta.env.VITE_API_URL;
+//   } 
+//   // 2. Try Standard process.env (Create React App / Node)
+//   else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
+//     API_BASE_URL = process.env.REACT_APP_API_URL;
+//   }
+// } catch (e) {
+//   // If accessing these objects throws an error (e.g. strict mode or specific bundlers),
+//   // we silently fall back to the default localhost.
+//   console.log("Using default API URL:", API_BASE_URL);
+// }
 
 // Remove trailing slash if present to avoid double slashes like '...com//competitions'
 if (API_BASE_URL.endsWith('/')) {
