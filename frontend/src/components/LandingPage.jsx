@@ -2,13 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../LandingPage.css';
 
-// ... (Keep PodiumTable component exactly the same) ...
+// --- CONFIGURATION ---
+// FIXED: This robust check supports both Vite (import.meta) and standard environments (process.env)
+// It safely checks if import.meta exists before trying to access it.
+let API_BASE_URL = 'http://localhost:8000';
+
+try {
+  // Check if we are in a Vite environment
+  if (import.meta && import.meta.env && import.meta.env.VITE_API_URL) {
+    API_BASE_URL = import.meta.env.VITE_API_URL;
+  } 
+  // Fallback to process.env for other environments (like this preview or Create React App)
+  else if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
+    API_BASE_URL = process.env.REACT_APP_API_URL;
+  }
+} catch (e) {
+  // If any access fails, we stick to the default localhost
+  console.warn("Could not read environment variables, defaulting to localhost");
+}
+
 const PodiumTable = ({ compId, discipline }) => {
   const [skaters, setSkaters] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/competition/${compId}/summary`, {
+    // UPDATED: Using API_BASE_URL
+    axios.get(`${API_BASE_URL}/competition/${compId}/summary`, {
         params: { category: discipline }
     })
       .then(res => {
@@ -61,7 +80,8 @@ export default function LandingPage({ onNavigate }) {
   const [openCompIds, setOpenCompIds] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/competitions')
+    // UPDATED: Using API_BASE_URL
+    axios.get(`${API_BASE_URL}/competitions`)
       .then(res => {
         const grouped = groupCompetitionsByYear(res.data);
         setSeasons(grouped);
