@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session, joinedload
-from database import SessionLocal, SkaterPerformance, Competition
+import pandas as pd
+from data_manager import load_data, FILES
+import os
 
 app = FastAPI()
 
@@ -13,110 +14,94 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Cache data in memory on startup so it's super fast
+# In production, if you update CSVs, the server usually restarts, refreshing this cache
+class DataCache:
+    competitions = []
+    performances = []
+    elements = []
+    components = []
+
+@app.on_event("startup")
+def load_csv_data():
+    if os.path.exists(FILES["competitions"]):
+        DataCache.competitions = pd.read_csv(FILES["competitions"]).to_dict('records')
+    if os.path.exists(FILES["performances"]):
+        DataCache.performances = pd.read_csv(FILES["performances"]).to_dict('records')
+    if os.path.exists(FILES["elements"]):
+        DataCache.elements = pd.read_csv(FILES["elements"]).to_dict('records')
+    if os.path.exists(FILES["components"]):
+        DataCache.components = pd.read_csv(FILES["components"]).to_dict('records')
+    print("✅ CSV Data Loaded into Memory")
 
 @app.get("/competitions")
-def get_competitions(db: Session = Depends(get_db)):
-    return db.query(Competition).all()
+def get_competitions():
+    return DataCache.competitions
 
-# --- SUMMARY (PODIUM) ENDPOINT ---
 @app.get("/competition/{competition_id}/summary")
-def get_competition_summary(competition_id: int, category: str = None, db: Session = Depends(get_db)):
-    query = db.query(SkaterPerformance).filter(SkaterPerformance.competition_id == competition_id)
+def get_competition_summary(competition_id: int, category: str = None):
+    # Filter performances using list comprehension (fast for small/medium datasets)
+    perfs = [p for p in DataCache.performances if p['competition_id'] == competition_id]
     
-    # 1. Filter by Category (Men vs Women)
     if category:
-        query = query.filter(SkaterPerformance.category == category)
+        perfs = [p for p in perfs if p['category'] == category]
     
-    results = query.all()
-    
-    # 2. Group SP + FS
+    # Grouping Logic
     skaters = {}
-    for p in results:
-        if p.skater_name not in skaters:
-            skaters[p.skater_name] = {
-                "name": p.skater_name,
-                "nation": p.nation,
+    for p in perfs:
+        name = p['skater_name']
+        if name not in skaters:
+            skaters[name] = {
+                "name": name,
+                "nation": p['nation'],
                 "sp": {"score": 0, "rank": "-"},
                 "fs": {"score": 0, "rank": "-"},
                 "total": 0
             }
         
-        if "Short" in p.program_type:
-            skaters[p.skater_name]["sp"] = {"score": p.total_score, "rank": p.rank}
-        elif "Free" in p.program_type:
-            skaters[p.skater_name]["fs"] = {"score": p.total_score, "rank": p.rank}
+        if "Short" in p['program_type']:
+            skaters[name]["sp"] = {"score": p['total_score'], "rank": int(p['rank'])}
+        elif "Free" in p['program_type']:
+            skaters[name]["fs"] = {"score": p['total_score'], "rank": int(p['rank'])}
 
-    # 3. Sum and Sort
     summary_list = []
-    for name, data in skaters.items():
-        total_score = 0
-        if data["sp"]["score"]: total_score += data["sp"]["score"]
-        if data["fs"]["score"]: total_score += data["fs"]["score"]
-        
-        data["total"] = total_score
-        if total_score > 0:
+    for data in skaters.values():
+        total = 0
+        if data["sp"]["score"]: total += data["sp"]["score"]
+        if data["fs"]["score"]: total += data["fs"]["score"]
+        data["total"] = total
+        if total > 0:
             summary_list.append(data)
 
     summary_list.sort(key=lambda x: x["total"], reverse=True)
     return summary_list[:3]
 
-# --- PROTOCOLS ENDPOINT ---
 @app.get("/performances/{competition_id}")
-def get_performances(competition_id: int, category: str = None, db: Session = Depends(get_db)):
-    query = db.query(SkaterPerformance)\
-        .options(joinedload(SkaterPerformance.elements))\
-        .options(joinedload(SkaterPerformance.components))\
-        .filter(SkaterPerformance.competition_id == competition_id)
-
-    # Filter here too so you don't load Women when looking at Men
+def get_performances(competition_id: int, category: str = None):
+    # 1. Filter Performances
+    perfs = [p for p in DataCache.performances if p['competition_id'] == competition_id]
     if category:
-        query = query.filter(SkaterPerformance.category == category)
-
-    results = query.all()
-    
-    data = []
-    for p in results:
-        p_dict = {
-            "id": p.id,
-            "skater_name": p.skater_name,
-            "nation": p.nation,
-            "rank": p.rank,
-            "program_type": p.program_type,
-            "total_score": p.total_score,
-            "tes_score": p.tes_score,
-            "pcs_score": p.pcs_score,
-            "deductions": p.deductions,
-            "elements": [],
-            "components": []
-        }
+        perfs = [p for p in perfs if p['category'] == category]
         
-        for e in p.elements:
-            p_dict["elements"].append({
-                "element_index": e.element_index,
-                "element_name": e.element_name,
-                "base_value": e.base_value,
-                "goe": e.goe,
-                "panel_score": e.panel_score,
-                "judges_scores": e.judges_scores,
-                "is_bonus": e.is_bonus
-            })
-        p_dict["elements"].sort(key=lambda x: x["element_index"])
+    perf_ids = [p['id'] for p in perfs]
 
-        for c in p.components:
-            p_dict["components"].append({
-                "component_index": c.component_index,
-                "component_name": c.component_name,
-                "factor": c.factor,
-                "panel_score": c.panel_score,
-                "judges_scores": c.judges_scores
-            })
-        p_dict["components"].sort(key=lambda x: x["component_index"])
-            
+    # 2. Filter Elements & Components (Optimized with Sets)
+    relevant_elements = [e for e in DataCache.elements if e['performance_id'] in perf_ids]
+    relevant_components = [c for c in DataCache.components if c['performance_id'] in perf_ids]
+
+    data = []
+    for p in perfs:
+        # Join data manually
+        my_elements = [e for e in relevant_elements if e['performance_id'] == p['id']]
+        my_components = [c for c in relevant_components if c['performance_id'] == p['id']]
+        
+        # Sort
+        my_elements.sort(key=lambda x: x['element_index'])
+        my_components.sort(key=lambda x: x['component_index'])
+
+        p_dict = p.copy()
+        p_dict["elements"] = my_elements
+        p_dict["components"] = my_components
         data.append(p_dict)
+        
     return data

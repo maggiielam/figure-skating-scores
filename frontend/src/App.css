@@ -155,7 +155,7 @@ table.protocol-table {
 
 /* Info Column Split */
 .protocol-table th:nth-child(3), .protocol-table td:nth-child(3) { width: 80px; }
-.info-split-container { display: flex; justify-content: center; alignItems: center; gap: 10px; }
+.info-split-container { display: flex; justify-content: center; align-items: center; gap: 10px; }
 .fall-marker { display: inline-block; width: 15px; text-align: center; font-weight: 700; color: #1e293b; }
 .tech-flags { text-align: left; font-weight: 500; }
 

@@ -1,4 +1,4 @@
-from scraper import scrape_pdf, init_db
+from scraper import scrape_pdf
 
 # ---------------------------------------------------------
 # HAND LABEL YOUR FILES HERE
@@ -6,16 +6,88 @@ from scraper import scrape_pdf, init_db
 # ---------------------------------------------------------
 TASKS = [
     # (
-    #     "/Users/maggie/Downloads/m_free.pdf", 
-    #     "GP de France", 
+    #     "/Users/maggie/Downloads/chn_m_free.pdf", 
+    #     "GP Cup of China", 
     #     "2025-2026", 
     #     "Free", 
     #     "Men", 
-    #     "Angers, FRA",
-    #     "Oct 17-19"
+    #     "Chongqing, CHN",
+    #     "Oct 24-26"
     # ),
+    # (
+    #     "/Users/maggie/Downloads/chn_m_short.pdf", 
+    #     "GP Cup of China", 
+    #     "2025-2026", 
+    #     "Short", 
+    #     "Men", 
+    #     "Chongqing, CHN",
+    #     "Oct 24-26"
+    # ),
+    # (
+    #     "/Users/maggie/Downloads/chn_w_free.pdf", 
+    #     "GP Cup of China", 
+    #     "2025-2026", 
+    #     "Free", 
+    #     "Women", 
+    #     "Chongqing, CHN",
+    #     "Oct 24-26"
+    # ),
+    # (
+    #     "/Users/maggie/Downloads/chn_w_short.pdf", 
+    #     "GP Cup of China", 
+    #     "2025-2026", 
+    #     "Short", 
+    #     "Women", 
+    #     "Chongqing, CHN",
+    #     "Oct 24-26"
+    # ),
+    #     (
+    #     "/Users/maggie/Downloads/can_m_free.pdf", 
+    #     "GP Skate Canada", 
+    #     "2025-2026", 
+    #     "Free", 
+    #     "Men", 
+    #     "Saskatoon, CAN",
+    #     "Oct 31-Nov 2"
+    # ),
+    # (
+    #     "/Users/maggie/Downloads/can_m_short.pdf", 
+    #     "GP Skate Canada", 
+    #     "2025-2026", 
+    #     "Short", 
+    #     "Men", 
+    #     "Saskatoon, CAN",
+    #     "Oct 31-Nov 2"
+    # ),
+    # (
+    #     "/Users/maggie/Downloads/can_w_free.pdf", 
+    #     "GP Skate Canada", 
+    #     "2025-2026", 
+    #     "Free", 
+    #     "Women", 
+    #     "Saskatoon, CAN",
+    #     "Oct 31-Nov 2"
+    # ),
+    # (
+    #     "/Users/maggie/Downloads/can_w_short.pdf", 
+    #     "GP Skate Canada", 
+    #     "2025-2026", 
+    #     "Short", 
+    #     "Women", 
+    #     "Saskatoon, CAN",
+    #     "Oct 31-Nov 2"
+    # ),
+            (
+        "/Users/maggie/Downloads/fin_m_free.pdf", 
+        "GP Finlandia Trophy", 
+        "2025-2026", 
+        "Free", 
+        "Men", 
+        "Helsinki, FIN",
+        "Nov 21-22"
+    ),
     (
-        "/Users/maggie/Downloads/m_short.pdf", 
+        "/Users/maggie/Downloads/fin_m_short.pdf", 
         "GP Finlandia Trophy", 
         "2025-2026", 
         "Short", 
@@ -23,31 +95,32 @@ TASKS = [
         "Helsinki, FIN",
         "Nov 21-22"
     ),
-    # (
-    #     "/Users/maggie/Downloads/w_free.pdf", 
-    #     "GP de France", 
-    #     "2025-2026", 
-    #     "Free", 
-    #     "Women", 
-    #     "Angers, FRA",
-    #     "Oct 17-19"
-    # ),
     (
-        "/Users/maggie/Downloads/w_short.pdf", 
+        "/Users/maggie/Downloads/fin_w_free.pdf", 
+        "GP Finlandia Trophy", 
+        "2025-2026", 
+        "Free", 
+        "Women", 
+        "Helsinki, FIN",
+        "Nov 21-22"
+    ),
+    (
+        "/Users/maggie/Downloads/fin_w_short.pdf", 
         "GP Finlandia Trophy", 
         "2025-2026", 
         "Short", 
         "Women", 
         "Helsinki, FIN",
         "Nov 21-22"
-    )
+    ),
+
 ]
 
 def main():
     print("Starting Batch Import...")
     
-    # Initialize Database once
-    init_db()
+    # # Initialize Database once
+    # init_db()
     
     for i, task in enumerate(TASKS):
         # Unpack all 7 arguments
